@@ -3,77 +3,70 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KPU – Offline (Admin + ISO týdny + AutoSave + Debug mód)</title>
+<title>KPU v2.0 — jednoduchý plánovač s ISO týdny</title>
 <style>
-  :root{--b:#1f6feb;--bg:#0d1117;--fg:#e6edf3;--muted:#8b949e;--card:#161b22;--br:#30363d;}
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--fg);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
-  header{padding:20px 24px;border-bottom:1px solid var(--br)}
-  h1{margin:0;font-size:20px}
-  main{padding:20px 24px;display:grid;gap:16px;grid-template-columns:1fr}
-  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-  .card{background:var(--card);border:1px solid var(--br);border-radius:12px;padding:16px}
-  select,button,input,textarea{background:#0b1220;border:1px solid var(--br);color:var(--fg);padding:8px 10px;border-radius:8px;font-size:14px}
-  button{cursor:pointer}
-  button.primary{background:var(--b);border-color:transparent}
-  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
-  th,td{border:1px solid var(--br);padding:8px;vertical-align:top}
-  th{background:#0b1220;text-align:left}
-  .muted{color:var(--muted)}
-  .pill{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--br);font-size:12px}
-  .right{margin-left:auto}
-  .tabs button{background:#0b1220;border:1px solid var(--br);border-radius:999px;padding:6px 10px}
-  .tabs button.active{background:var(--b);border-color:transparent}
-  .scroll-x{overflow:auto}
-  .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);padding:24px}
-  .modal .panel{width:min(920px,95vw);max-height:90vh;overflow:auto;background:var(--card);border:1px solid var(--br);border-radius:14px;padding:16px}
-  .tabs-admin button{background:#0b1220;border:1px solid var(--br);border-radius:999px;padding:6px 10px;margin-right:6px}
-  .tabs-admin button.active{background:#1f6feb;border-color:transparent}
-  .hidden{display:none}
-  textarea{width:100%;min-height:220px}
-  input[type="password"]{letter-spacing:0.05em}
-  .danger{background:#7f1d1d;border-color:#9b1c1c}
-  .tip{font-size:12px;color:#b2bac2}
-  .ok{color:#4ade80}
-  .err{color:#f87171}
-  /* Debug konzole */
-  #debugWrap{position:fixed;left:0;right:0;bottom:0;background:#0b1220;border-top:1px solid var(--br);max-height:40vh;display:none}
-  #debugHead{display:flex;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--br)}
-  #debugHead strong{font-size:13px}
-  #debugBody{padding:8px 10px;overflow:auto}
-  #debugLog{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;color:#c7d1db;margin:0}
-  .debug-badge{font-size:11px;padding:2px 6px;border:1px solid var(--br);border-radius:999px}
+  :root{ --bg:#0d1117; --panel:#161b22; --accent:#2ea043; --muted:#8b949e; --text:#c9d1d9; --danger:#da3633; --warn:#d29922; --blue:#1f6feb; }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; background:var(--bg); color:var(--text); font:14px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji"; }
+  h1,h2,h3{ margin:0 0 6px; font-weight:600; }
+  header{ padding:12px 16px; border-bottom:1px solid #30363d; position:sticky; top:0; background:rgba(13,17,23,.85); backdrop-filter:saturate(180%) blur(6px); }
+  .row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .card{ background:var(--panel); border:1px solid #30363d; border-radius:8px; margin:12px 16px; padding:12px; }
+  .muted{ color:var(--muted); }
+  .pill{ padding:2px 8px; border:1px solid #30363d; border-radius:999px; font-size:12px; }
+  button,select,input,textarea{ background:#0b1220; color:var(--text); border:1px solid #30363d; border-radius:6px; padding:8px 10px; }
+  button{ cursor:pointer; }
+  button.primary{ background:var(--blue); border-color:#224f9e; }
+  button.ghost{ background:transparent; }
+  button.danger{ background:var(--danger); border-color:#8a1f1d; }
+  button:disabled{ opacity:.5; cursor:not-allowed; }
+  .right{ margin-left:auto; }
+  .tabs button{ background:#0b1220; }
+  .tabs button.active{ background:#1f6feb; border-color:#224f9e; }
+  table{ border-collapse:collapse; width:100%; min-width:720px; }
+  th,td{ border:1px solid #30363d; padding:6px 8px; text-align:left; }
+  th{ background:#0b1220; }
+  input[type="text"]{ width:100%; }
+  .scroll-x{ overflow:auto; }
+  /* Modal */
+  .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.5); z-index:20; }
+  .panel{ width:min(920px,95vw); background:var(--panel); border:1px solid #30363d; border-radius:8px; padding:12px; }
+  .hidden{ display:none !important; }
+  /* Admin tabs */
+  .tabs-admin{ gap:6px; margin:8px 0; }
+  .tabs-admin button{ background:#0b1220; }
+  .tabs-admin button.active{ background:#1f6feb; border-color:#224f9e; }
+  /* Debug panel */
+  #debugWrap{ position:fixed; left:0; right:0; bottom:0; background:#0b1220; border-top:1px solid #30363d; max-height:42vh; display:none; flex-direction:column; }
+  #debugHead{ padding:8px 12px; display:flex; align-items:center; gap:8px; border-bottom:1px solid #30363d; }
+  #debugBody{ padding:8px 12px; overflow:auto; font-family:ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size:12px; white-space:pre-wrap; }
+  .label{ padding:2px 6px; border-radius:4px; font-size:11px; border:1px solid #30363d; }
+  .label.warn{ color:#fff; background:#6e5300; }
+  .label.ok{ color:#fff; background:#055d20; }
+  .label.err{ color:#fff; background:#7a1513; }
 </style>
 </head>
 <body>
-<header>
-  <div class="row">
-    <h1>KPU – Offline plánovač (AutoSave + Admin + ISO týdny)</h1>
-    <span class="muted pill">LocalStorage</span>
-    <button id="btnAdmin" class="right">🔒 Admin</button>
+<header class="row">
+  <h1>KPU v2.0</h1>
+  <span class="muted pill">LocalStorage</span>
+  <div class="tabs right">
+    <button class="tab" data-mode="W">Týdenní</button>
+    <button class="tab" data-mode="M">Měsíční</button>
+    <button class="tab" data-mode="Q">Čtvrtletní</button>
+    <button class="tab" data-mode="H">Pololetní</button>
+    <button class="tab" data-mode="Y">Roční</button>
+    <button class="tab" data-mode="D">Denní</button>
   </div>
+  <button id="btnAdmin" class="right">🔒 Admin</button>
 </header>
 
 <main>
   <div class="card">
-    <div class="row tabs">
-      <button data-mode="W" class="active">Týdenní</button>
-      <button data-mode="M">Měsíční</button>
-      <button data-mode="Q">Čtvrtletní</button>
-      <button data-mode="H">Pololetní</button>
-      <button data-mode="Y">Roční</button>
-      <button data-mode="D">Denní</button>
-      <span id="modeHint" class="muted right"></span>
-    </div>
+    <div class="row"><span id="modeHint" class="muted"></span></div>
+    <div id="selectorRow" class="row" style="margin-top:6px"></div>
+    <div class="row"><span id="status" class="muted"></span></div>
   </div>
-
-  <div class="card">
-    <div class="row" id="selectorRow"></div>
-    <div class="row" style="margin-top:8px">
-      <span id="status" class="muted"></span>
-    </div>
-  </div>
-
   <div class="card scroll-x">
     <table id="tbl"></table>
   </div>
@@ -84,60 +77,61 @@
   <div class="panel">
     <div class="row">
       <strong>Admin</strong>
-      <button id="adminClose" class="right">Zavřít</button>
+      <button id="adminClose" class="right ghost">Zavřít</button>
     </div>
 
     <div id="adminGate">
       <p class="muted">Zadej PIN pro přístup do administrace.</p>
-      <div class="row">
+      <div class="row" id="pinRow">
         <input id="pinInput" type="password" placeholder="PIN (4–12 znaků)">
         <button id="pinEnter" class="primary" type="button">Vstoupit</button>
+      </div>
+      <div id="setupPin" class="hidden">
+        <p class="muted">První spuštění: nastav PIN pro administraci.</p>
+        <div class="row">
+          <input id="pinSetup1" type="password" placeholder="Nový PIN (4–12 znaků)">
+          <input id="pinSetup2" type="password" placeholder="Znovu nový PIN">
+          <button id="pinSetupBtn" class="primary" type="button">Nastavit PIN</button>
+        </div>
+        <p class="muted">PIN se ukládá pouze lokálně v tomto prohlížeči.</p>
       </div>
       <p class="muted" id="pinInfo"></p>
     </div>
 
     <div id="adminBody" class="hidden">
       <div class="row tabs-admin" style="margin:10px 0">
-        <button data-tab="data" class="active">Data (Export/Import/Vymazat)</button>
-        <button data-tab="tasks">Úkoly (Editor)</button>
-        <button data-tab="sec">Zabezpečení (PIN)</button>
+        <button data-tab="data" class="active">Data</button>
+        <button data-tab="tasks">Úkoly</button>
+        <button data-tab="sec">Zabezpečení</button>
       </div>
 
       <section id="tab-data">
-        <div class="row">
-          <button id="btnExport" type="button">Export JSON</button>
-          <input type="file" id="importFile" accept="application/json">
-          <button id="btnImport" type="button">Import JSON</button>
-          <button id="btnReset" class="danger" type="button">Vymazat všechna uložená data</button>
+        <div class="row" style="margin:8px 0">
+          <button id="btnExport">Export (JSON)</button>
+          <input id="fileImport" type="file" accept="application/json">
+          <button id="btnImport">Import</button>
+          <button id="btnReset" class="danger">Vymazat všechna data</button>
         </div>
-        <p class="muted">Export/Import pracuje s interním úložištěm (LocalStorage). Po vymazání se tabulky vyprázdní.</p>
-
-        <hr style="border-color:var(--br);margin:14px 0">
-        <h3 style="margin:8px 0">Automatická záloha do <em>jednoho</em> JSON souboru</h3>
-        <p class="tip">Desktop Chrome/Edge + HTTPS/localhost: tiché přepsání vybraného souboru. iOS: nabídne stažení <code>KPU_backup.json</code> k ručnímu nahrazení.</p>
-        <div class="row">
-          <button id="btnBackupTarget" class="primary" type="button">Vybrat cílový soubor zálohy…</button>
-          <button id="btnBackupNow" type="button">Zálohovat teď</button>
+        <div class="row" style="margin:8px 0">
+          <button id="btnPickFile">Vybrat cílový soubor (FSA)</button>
+          <label class="muted">Auto záloha:</label>
+          <input id="backupAuto" type="checkbox">
           <span id="backupInfo" class="muted"></span>
         </div>
-        <label style="display:block;margin-top:8px"><input type="checkbox" id="backupAuto"> Po každém uložení také přepsat záložní soubor</label>
-
-        <hr style="border-color:var(--br);margin:14px 0">
-        <h3 style="margin:8px 0">Debug mód</h3>
-        <label style="display:block;margin-bottom:8px"><input type="checkbox" id="debugEnable"> Zapnout debug panel s logem</label>
-        <div class="row">
-          <button id="debugClear" type="button">Vyčistit log</button>
-          <button id="debugDownload" type="button">Stáhnout log</button>
-          <span id="debugInfo" class="muted"></span>
+        <div class="row" style="margin:8px 0">
+          <label class="muted">Debug panel:</label>
+          <input id="debugEnable" type="checkbox">
         </div>
       </section>
 
       <section id="tab-tasks" class="hidden">
-        <p class="muted">Uprav seznam úkolů pro <span id="tasksModeLabel">aktuální režim</span> (jedna položka = jeden řádek).</p>
-        <textarea id="tasksArea"></textarea>
-        <div class="row" style="margin-top:8px">
-          <button id="btnTasksSave" class="primary" type="button">Uložit seznam</button>
-          <button id="btnTasksReset" type="button">Obnovit výchozí seznam</button>
+        <div class="row" style="margin-bottom:6px">
+          <span class="muted">Seznam úkolů pro aktuální režim (<span id="modeBadge"></span>) — jeden řádek = jeden úkol.</span>
+        </div>
+        <textarea id="tasksText" rows="10" style="width:100%; resize:vertical" placeholder="Napiš úkoly, každý na nový řádek"></textarea>
+        <div class="row" style="margin-top:6px">
+          <button id="tasksSave" class="primary">Uložit úkoly</button>
+          <button id="tasksClear" class="ghost">Vyčistit úkoly</button>
           <span id="tasksMsg" class="muted"></span>
         </div>
       </section>
@@ -145,7 +139,7 @@
       <section id="tab-sec" class="hidden">
         <p class="muted">Změna PINu pro admin menu.</p>
         <div class="row">
-          <input id="pinNew1" type="password" placeholder="Nový PIN">
+          <input id="pinNew1" type="password" placeholder="Nový PIN (4–12 znaků)">
           <input id="pinNew2" type="password" placeholder="Znovu nový PIN">
           <button id="pinChange" class="primary" type="button">Změnit PIN</button>
         </div>
@@ -158,440 +152,527 @@
 <div id="debugWrap">
   <div id="debugHead">
     <strong>Debug log</strong>
-    <span class="debug-badge" id="dbgStat">běží</span>
-    <button id="dbgCollapse" class="right" type="button">Skrýt</button>
+    <span id="debugStatus" class="label ok">ON</span>
+    <button id="debugClear" class="right ghost">Vyčistit</button>
+    <button id="debugHide" class="ghost">Skrýt</button>
   </div>
-  <div id="debugBody"><pre id="debugLog"></pre></div>
+  <div id="debugBody"></div>
 </div>
 
 <script>
-// ====== Debug util ======
-(function(){
-  const wrap = document.getElementById('debugWrap');
-  const out = document.getElementById('debugLog');
-  const info = document.getElementById('debugInfo');
-  const collapseBtn = document.getElementById('dbgCollapse');
-  let enabled = false;
-  let collapsed = false;
-  function ts(){ const d=new Date(); return d.toISOString(); }
-  function append(line){ out.textContent += line + "\\n"; out.parentElement.scrollTop = out.parentElement.scrollHeight; }
-  function setEnabled(v){
-    enabled = !!v;
-    wrap.style.display = enabled ? 'block' : 'none';
-    const s=getStore(); if(!s.debug) s.debug={}; s.debug.enabled = enabled; setStore(s);
-    info.textContent = enabled ? "Debug panel je zapnutý." : "Debug panel je vypnutý.";
+/*** ========== Pomocné utily ========== ***/
+const LS_KEY = "kpu_v2_store";
+const PIN_KEY = "kpu_v2_pin";
+
+function getStore(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return {};
+    return JSON.parse(raw);
+  }catch(e){
+    console.error("getStore parse error", e);
+    return {};
   }
-  window.__dbg = {
-    log: (...args)=>{ try{ if(enabled) append("[LOG  "+ts()+"] "+args.map(x=>typeof x==='string'?x:JSON.stringify(x)).join(' ')); }catch(e){} },
-    error: (...args)=>{ try{ if(enabled) append("[ERROR "+ts()+"] "+args.map(x=> (x && x.stack) ? (x.stack) : (typeof x==='string'?x:JSON.stringify(x))).join(' ')); }catch(e){} },
-    set: setEnabled,
-    isOn: ()=>enabled,
-    dumpStore: ()=>{ try{ const s=getStore(); __dbg.log("STORE:", s); }catch(e){ __dbg.error("dumpStore failed", e); } }
-  };
-  collapseBtn.addEventListener('click', ()=>{
-    collapsed = !collapsed;
-    document.getElementById('debugBody').style.display = collapsed ? 'none' : 'block';
-    collapseBtn.textContent = collapsed ? "Zobrazit" : "Skrýt";
-  });
-  // Mirror console
-  const _log = console.log, _err = console.error;
-  console.log = (...a)=>{ _log.apply(console,a); __dbg.log(...a); };
-  console.error = (...a)=>{ _err.apply(console,a); __dbg.error(...a); };
-})();
-
-// ====== Základní data ======
-const MONTHS = ["LEDEN","ÚNOR","BŘEZEN","DUBEN","KVĚTEN","ČERVEN","ČERVENEC","SRPEN","ZÁŘÍ","ŘÍJEN","LISTOPAD","PROSINEC"];
-const TASKS_DEFAULT = { W:[], M:[], Q:[], H:[], Y:[], D:[] };
-const LS_KEY = "kpu_multi_admin_iso_debug1";
-
-function getStore(){ try{ const s = JSON.parse(localStorage.getItem(LS_KEY))||{}; __dbg.log("getStore ok"); return s; }catch(e){ __dbg.error("getStore JSON.parse error", e); return {}; } }
-function setStore(o){ try{ localStorage.setItem(LS_KEY, JSON.stringify(o)); __dbg.log("setStore ok"); }catch(e){ __dbg.error("setStore error", e); throw e; } }
+}
+function setStore(s){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify(s));
+  }catch(e){
+    console.error("setStore error", e);
+  }
+}
 function getUI(){ const s=getStore(); return s.ui||{}; }
 function setUI(ui){ const s=getStore(); s.ui=ui; setStore(s); }
 
-// ====== ISO týdny ======
-function isoWeeksForYear(year) {
-  const jan4 = new Date(Date.UTC(year, 0, 4));
-  const day = jan4.getUTCDay() || 7;
-  const monday = new Date(jan4); monday.setUTCDate(jan4.getUTCDate() - (day-1));
-  const weeks = [];
-  let cur = new Date(monday);
-  let weekNum = 1;
-  while (true) {
-    const start = new Date(cur);
-    const end = new Date(cur); end.setUTCDate(end.getUTCDate() + 6);
-    const isoYearOfStart = isoWeekYear(start);
-    if (isoYearOfStart > year) break;
-    if (isoYearOfStart === year) weeks.push({week: weekNum, start, end});
-    cur.setUTCDate(cur.getUTCDate() + 7);
-    weekNum += 1;
-    if (weekNum > 60) break;
+/*** ========== Debug panel ========== ***/
+const __dbg=(function(){
+  const wrap=document.getElementById("debugWrap");
+  const body=document.getElementById("debugBody");
+  const status=document.getElementById("debugStatus");
+  const origLog = console.log.bind(console);
+  const origErr = console.error.bind(console);
+  function append(kind, args){
+    const t = new Date().toLocaleTimeString();
+    const line = document.createElement("div");
+    line.innerHTML = "<span class='muted'>["+t+"]</span> "+(kind==="error"?"<span class='label err'>ERR</span> ":"")+args.map(a=>{
+      try{ return (typeof a==="object")? JSON.stringify(a) : String(a); }catch(_){ return String(a); }
+    }).join(" ");
+    body.appendChild(line);
+    body.scrollTop = body.scrollHeight;
   }
-  return weeks;
-}
-function isoWeekYear(d) {
-  const tmp = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
-  tmp.setUTCDate(tmp.getUTCDate() + 4 - ((tmp.getUTCDay() || 7)));
-  return tmp.getUTCFullYear();
-}
-function fmtDMY(d) {
-  const dd = String(d.getUTCDate()).padStart(2,'0');
-  const mm = String(d.getUTCMonth()+1).padStart(2,'0');
-  const yy = d.getUTCFullYear();
-  return dd+"."+mm+"."+yy;
-}
-function weekLabel(obj) {
-  return obj.week + ". týden (" + fmtDMY(obj.start) + "–" + fmtDMY(obj.end) + ")";
+  console.log = (...a)=>{ append("log", a); origLog(...a); };
+  console.error = (...a)=>{ append("error", a); origErr(...a); };
+  return {
+    set:(on)=>{ wrap.style.display = on ? "flex" : "none"; status.textContent = on? "ON":"OFF"; status.className = "label " + (on?"ok":"warn"); },
+    log:(...a)=>console.log(...a),
+    error:(...a)=>console.error(...a),
+    clear:()=>{ body.innerHTML=""; }
+  }
+})();
+
+/*** ========== SHA-256 (fallback bez SubtleCrypto) ========== ***/
+async function sha256(text){
+  if (window.crypto && window.crypto.subtle){
+    const data=new TextEncoder().encode(text);
+    const buf=await window.crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+  }
+  // Pure-JS SHA-256 (krátká implementace)
+  function rrot(n,x){ return (x>>>n) | (x<<(32-n)); }
+  function ch(x,y,z){ return (x & y) ^ (~x & z); }
+  function maj(x,y,z){ return (x & y) ^ (x & z) ^ (y & z); }
+  function SIG0(x){ return rrot(2,x) ^ rrot(13,x) ^ rrot(22,x); }
+  function SIG1(x){ return rrot(6,x) ^ rrot(11,x) ^ rrot(25,x); }
+  function sig0(x){ return rrot(7,x) ^ rrot(18,x) ^ (x>>>3); }
+  function sig1(x){ return rrot(17,x) ^ rrot(19,x) ^ (x>>>10); }
+  const K=[
+    0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+  ];
+  let msg = new TextEncoder().encode(String(text));
+  let l = msg.length * 8;
+  let withOne = new Uint8Array(((msg.length+9+63)>>6)<<6);
+  withOne.set(msg);
+  withOne[msg.length]=0x80;
+  let dv = new DataView(withOne.buffer);
+  dv.setUint32(withOne.length-4, l>>>0); // lower 32
+  dv.setUint32(withOne.length-8, Math.floor(l/2**32)); // upper 32
+
+  let H0=0x6a09e667, H1=0xbb67ae85, H2=0x3c6ef372, H3=0xa54ff53a, H4=0x510e527f, H5=0x9b05688c, H6=0x1f83d9ab, H7=0x5be0cd19;
+  let W=new Uint32Array(64);
+  for(let i=0;i<withOne.length;i+=64){
+    for(let t=0;t<16;t++) W[t]=dv.getUint32(i+t*4);
+    for(let t=16;t<64;t++) W[t]=(sig1(W[t-2]) + W[t-7] + sig0(W[t-15]) + W[t-16])>>>0;
+    let a=H0,b=H1,c=H2,d=H3,e=H4,f=H5,g=H6,h=H7;
+    for(let t=0;t<64;t++){
+      let T1=(h + SIG1(e) + ch(e,f,g) + K[t] + W[t])>>>0;
+      let T2=(SIG0(a) + maj(a,b,c))>>>0;
+      h=g; g=f; f=e; e=(d + T1)>>>0; d=c; c=b; b=a; a=(T1 + T2)>>>0;
+    }
+    H0=(H0+a)>>>0; H1=(H1+b)>>>0; H2=(H2+c)>>>0; H3=(H3+d)>>>0; H4=(H4+e)>>>0; H5=(H5+f)>>>0; H6=(H6+g)>>>0; H7=(H7+h)>>>0;
+  }
+  const H=[H0,H1,H2,H3,H4,H5,H6,H7];
+  return H.map(x=>x.toString(16).padStart(8,"0")).join("");
 }
 
-// ====== PIN ======
-const PIN_NS = LS_KEY + "_pin";
-async function sha256(text){
-  try{
-    if (window.crypto && window.crypto.subtle){
-      const enc = new TextEncoder().encode(text);
-      const buf = await window.crypto.subtle.digest("SHA-256", enc);
-      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
-    }
-  }catch(e){
-    try{ __dbg && __dbg.error && __dbg.error("sha256 subtle failed, fallback to plain", e); }catch(_){}
-  }
-  // Fallback pro ne-secure kontexty: "PLAIN:<text>"
-  return "PLAIN:" + String(text);
-}
-async function hasPin(){ return !!localStorage.getItem(PIN_NS); }
+/*** ========== PIN ========== ***/
+function pinRegex(){ return /^\S{4,12}$/; }
+async function hasPin(){ return !!localStorage.getItem(PIN_KEY); }
 async function verifyPin(pin){
   try{
-    const MASTER = "534709";
-    if (pin === MASTER){
-      try { __dbg && __dbg.log && __dbg.log("[DEBUG] Master PIN override used"); } catch(_){}
-      // Pokud ještě není žádný PIN, ulož výchozí (bezpečně, sha256 má fallback)
-      if (!localStorage.getItem(PIN_NS)){
-        const h = await sha256(MASTER);
-        localStorage.setItem(PIN_NS, JSON.stringify({hash: h}));
-      }
-      return true; // ✅ okamžitý návrat – už dál nic neověřujeme
-    }
-    let raw = localStorage.getItem(PIN_NS);
-    if (!raw){
-      const h = await sha256(MASTER);
-      localStorage.setItem(PIN_NS, JSON.stringify({hash: h}));
-      raw = localStorage.getItem(PIN_NS);
-      try { __dbg && __dbg.log && __dbg.log("PIN initial set to default 534709"); } catch(_){}
-    }
+    const raw = localStorage.getItem(PIN_KEY);
+    if (!raw) return false;
     const {hash} = JSON.parse(raw);
     const hIn = await sha256(pin);
     return hIn === hash;
-  }catch(e){
-    try { __dbg && __dbg.error && __dbg.error("verifyPin error", e); } catch(_){}
-    return false;
-  }
+  }catch(e){ __dbg.error("verifyPin error", e); return false; }
 }
-async function changePin(pin1,pin2){ if(pin1!==pin2) throw new Error("PIN se neshoduje."); if(!/^\S{4,12}$/.test(pin1)) throw new Error("PIN musí mít 4–12 znaků."); const hash=await sha256(pin1); localStorage.setItem(PIN_NS, JSON.stringify({hash})); __dbg.log("PIN changed"); }
+async function changePin(p1,p2){
+  if (p1!==p2) throw new Error("PIN se neshoduje.");
+  if (!pinRegex().test(p1)) throw new Error("PIN musí mít 4–12 znaků bez mezer.");
+  const hash=await sha256(p1);
+  localStorage.setItem(PIN_KEY, JSON.stringify({hash}));
+  __dbg.log("PIN changed");
+}
 
-// ====== Auto-save + admin ======
+/*** ========== ISO týdny ========== ***/
+function fmtDMY(d){ const dd=String(d.getDate()).padStart(2,"0"); const mm=String(d.getMonth()+1).padStart(2,"0"); return dd+"."+mm+"."+d.getFullYear(); }
+function weekLabel(obj){ return obj.week + ". týden (" + fmtDMY(obj.start) + "–" + fmtDMY(obj.end) + ")"; }
+function isoWeeksForYear(year){
+  // ISO: týden 1 = týden s 4. lednem; týdny začínají pondělím
+  const jan4 = new Date(Date.UTC(year,0,4));
+  const day = (jan4.getUTCDay()||7); // 1=Mon..7=Sun
+  const week1Mon = new Date(jan4); week1Mon.setUTCDate(jan4.getUTCDate() - (day-1));
+  const weeks = [];
+  let curMon = new Date(week1Mon);
+  while(true){
+    const curSun = new Date(curMon); curSun.setUTCDate(curMon.getUTCDate()+6);
+    // pokud pondělí přesáhne do dalšího roku (a není první týden nového), končíme
+    if (curMon.getUTCFullYear()>year && weeks.length>0) break;
+    // pokud je to týden 53, přidáme a končíme
+    if (curMon.getUTCFullYear()===year || (curMon.getUTCMonth()===0 && curMon.getUTCDate()<=3)){
+      weeks.push({week: weeks.length+1, start: new Date(curMon), end: curSun});
+    }
+    curMon = new Date(curMon); curMon.setUTCDate(curMon.getUTCDate()+7);
+    if (weeks.length>=54) break; // pojistka
+  }
+  return weeks;
+}
+
+/*** ========== UI / režimy / selektory ========== ***/
 let MODE = "W";
-const tabs = document.querySelectorAll(".tabs button");
+const MONTHS = ["Leden","Únor","Březen","Duben","Květen","Červen","Červenec","Srpen","Září","Říjen","Listopad","Prosinec"];
 const selectorRow = document.getElementById("selectorRow");
-const statusEl = document.getElementById("status");
 const tbl = document.getElementById("tbl");
+const statusEl = document.getElementById("status");
 const modeHint = document.getElementById("modeHint");
 
-function debounce(fn, wait){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args), wait); }; }
-const autoSave = debounce(async ()=>{ try{ saveCurrent(); statusEl.textContent="Uloženo."; __dbg.log("autoSave fired"); if (isBackupEnabled()) await writeBackup(); }catch(e){ __dbg.error("autoSave error", e); } }, 400);
-
-function getTasks(){
-  const s=getStore();
-  const custom = (s.tasksCustom && s.tasksCustom[MODE]) ? s.tasksCustom[MODE] : null;
-  const base = TASKS_DEFAULT[MODE] || [];
-  return (custom && custom.length) ? custom : base;
-}
-
-tabs.forEach(b=>b.addEventListener("click", ()=>{ setMode(b.getAttribute("data-mode")); syncTasksEditorIfOpen(); __dbg.log("setMode", MODE); }));
-
 function setMode(m){
-  const ui=getUI(); ui.mode=m; setUI(ui);
   MODE = m;
-  tabs.forEach(x=>x.classList.toggle("active", x.getAttribute("data-mode")===m));
-  statusEl.textContent="";
+  document.querySelectorAll(".tab").forEach(b=> b.classList.toggle("active", b.getAttribute("data-mode")===MODE));
+  const ui=getUI(); if(!ui.mode) ui.mode=MODE; ui.mode=MODE; setUI(ui);
   renderSelector();
   renderTable(loadCurrent());
-  tbl.removeEventListener("input", onTableInput);
-  tbl.addEventListener("input", onTableInput);
   modeHint.textContent = (MODE==="D") ? "Denní: vyber rok + měsíc. Ukládá se automaticky." : "Ukládá se automaticky.";
 }
-
-function onTableInput(e){ if (e.target && e.target.tagName==="INPUT") autoSave(); }
 
 function renderSelector(){
   try{
     selectorRow.innerHTML="";
+    // Rok
     const labY=document.createElement("label"); labY.innerHTML="<strong>Rok</strong>";
     const selY=document.createElement("select"); selY.id="yearSelect";
-    ["2025","2026","2027"].forEach(y=>{ const o=document.createElement("option"); o.value=y; o.textContent=y; selY.appendChild(o); });
+    const y0=(new Date()).getFullYear(); for(let y=y0-1;y<=y0+2;y++){ const o=document.createElement("option"); o.value=String(y); o.textContent=String(y); selY.appendChild(o); }
     selectorRow.appendChild(labY); selectorRow.appendChild(selY);
-    const ui=getUI(); if (ui.year && ["2025","2026","2027"].includes(String(ui.year[MODE]))) selY.value = String(ui.year[MODE]);
-
+    const ui=getUI(); if (ui.year && ui.year[MODE]) selY.value = String(ui.year[MODE]);
+    // Období
     const labP=document.createElement("label"); labP.style.marginLeft="10px"; labP.innerHTML="<strong>Období</strong>";
     const selP=document.createElement("select"); selP.id="periodSelect";
-
     if (MODE==="W"){
       const y=parseInt(selY.value,10);
       const weeks = isoWeeksForYear(y);
-      weeks.forEach(w=>{ const o=document.createElement("option"); o.value=String(w.week); o.textContent = weekLabel(w); selP.appendChild(o); });
+      weeks.forEach(w=>{ const o=document.createElement("option"); o.value=String(w.week); o.textContent=weekLabel(w); selP.appendChild(o); });
       selectorRow.appendChild(labP); selectorRow.appendChild(selP);
     }
-    if (MODE==="M" || MODE==="D"){ MONTHS.forEach(m=>{ const o=document.createElement("option"); o.value=m; o.textContent=m; selP.appendChild(o); }); selectorRow.appendChild(labP); selectorRow.appendChild(selP); }
-    if (MODE==="Q"){ ["Q1","Q2","Q3","Q4"].forEach(p=>{ const o=document.createElement("option"); o.value=p; o.textContent=p; selP.appendChild(o); }); selectorRow.appendChild(labP); selectorRow.appendChild(selP); }
-    if (MODE==="H"){ ["H1","H2"].forEach(p=>{ const o=document.createElement("option"); o.value=p; o.textContent=p; selP.appendChild(o); }); selectorRow.appendChild(labP); selectorRow.appendChild(selP); }
+    if (MODE==="M" || MODE==="D"){
+      MONTHS.forEach(m=>{ const o=document.createElement("option"); o.value=m; o.textContent=m; selP.appendChild(o); });
+      selectorRow.appendChild(labP); selectorRow.appendChild(selP);
+    }
+    if (MODE==="Q"){
+      ["Q1","Q2","Q3","Q4"].forEach(p=>{ const o=document.createElement("option"); o.value=p; o.textContent=p; selP.appendChild(o); });
+      selectorRow.appendChild(labP); selectorRow.appendChild(selP);
+    }
+    if (MODE==="H"){
+      ["H1","H2"].forEach(p=>{ const o=document.createElement("option"); o.value=p; o.textContent=p; selP.appendChild(o); });
+      selectorRow.appendChild(labP); selectorRow.appendChild(selP);
+    }
     if (MODE==="Y"){ /* jen rok */ }
 
     if (selP.options.length && ui.period && ui.period[MODE]){
       for (let i=0;i<selP.options.length;i++) if (selP.options[i].value===ui.period[MODE]) selP.selectedIndex=i;
     }
 
-    selY.addEventListener("change", ()=>{ 
-      const ui=getUI(); if(!ui.year) ui.year={}; ui.year[MODE]=selY.value; setUI(ui);
-      renderSelector(); renderTable(loadCurrent());
-      __dbg.log("year change", selY.value);
-    });
-    if (selP){
-      selP.addEventListener("change", ()=>{ const ui=getUI(); if(!ui.period) ui.period={}; ui.period[MODE]=selP.value; setUI(ui); renderTable(loadCurrent()); __dbg.log("period change", selP.value); });
-    }
+    selY.addEventListener("change", (e)=>{ const ui=getUI(); if(!ui.year) ui.year={}; ui.year[MODE]=selY.value; setUI(ui); renderSelector(); renderTable(loadCurrent()); });
+    selP.addEventListener("change", (e)=>{ const ui=getUI(); if(!ui.period) ui.period={}; ui.period[MODE]=selP.value; setUI(ui); renderTable(loadCurrent()); });
   }catch(e){ __dbg.error("renderSelector error", e); }
 }
 
-function monthLength(monthCZ, year){
-  const map={"LEDEN":31,"ÚNOR":28,"BŘEZEN":31,"DUBEN":30,"KVĚTEN":31,"ČERVEN":30,"ČERVENEC":31,"SRPEN":31,"ZÁŘÍ":30,"ŘÍJEN":31,"LISTOPAD":30,"PROSINEC":31};
-  let d=map[(monthCZ||"").toUpperCase()]||31;
-  if ((monthCZ||"").toUpperCase()==="ÚNOR"){
-    const y=parseInt(document.getElementById("yearSelect")?.value||year||"2025",10);
-    if (((y%4===0)&&(y%100!==0)) || (y%400===0)) d=29;
-  }
-  return d;
+function monthLength(monthName, year){
+  const idx = MONTHS.indexOf(monthName);
+  if (idx<0) return 30;
+  return new Date(year, idx+1, 0).getDate();
 }
 
+/*** ========== Tasks a hodnoty ========== ***/
+function getTasks(){
+  const s=getStore();
+  if (s.tasks && Array.isArray(s.tasks[MODE])) return s.tasks[MODE];
+  return [];
+}
+function setTasks(arr){
+  const s=getStore(); if(!s.tasks) s.tasks={}; s.tasks[MODE]=arr; setStore(s);
+}
 function loadCurrent(){
-  try{
-    const s=getStore();
-    if(!s.values) s.values={};
-    if(!s.values[MODE]) s.values[MODE]={};
-    const year = document.getElementById("yearSelect")?.value || "2025";
-    if(!s.values[MODE][year]) s.values[MODE][year]={};
-    const period = document.getElementById("periodSelect")?.value || (MODE==="Y" ? "ROK" : "");
-    if(!s.values[MODE][year][period]) s.values[MODE][year][period] = (MODE==="D") ? {} : {};
-    setStore(s);
-    __dbg.log("loadCurrent", {MODE, year, period});
-    return s.values[MODE][year][period];
-  }catch(e){ __dbg.error("loadCurrent error", e); return {}; }
+  const s=getStore();
+  if(!s.values) s.values={};
+  if(!s.values[MODE]) s.values[MODE]={};
+  const year=document.getElementById("yearSelect").value;
+  if(!s.values[MODE][year]){
+    if (MODE==="D"){ s.values[MODE][year]={}; } else { s.values[MODE][year]={}; }
+  }
+  if (MODE==="D"){
+    const month=document.getElementById("periodSelect").value;
+    if(!s.values.D[year][month]) s.values.D[year][month]={};
+    return s.values.D[year][month];
+  } else {
+    const period=document.getElementById("periodSelect")? document.getElementById("periodSelect").value : null;
+    if (MODE!=="Y" && period && !s.values[MODE][year][period]) s.values[MODE][year][period]={};
+    if (MODE==="Y") return s.values.Y[year] || (s.values.Y[year]={});
+    return s.values[MODE][year][period] || {};
+  }
+}
+function saveCurrent(obj){
+  const s=getStore(); if(!s.values) s.values={};
+  const year=document.getElementById("yearSelect").value;
+  if (MODE==="D"){
+    const month=document.getElementById("periodSelect").value;
+    if(!s.values.D) s.values.D={}; if(!s.values.D[year]) s.values.D[year]={}; s.values.D[year][month]=obj;
+  } else if (MODE==="Y"){
+    if(!s.values.Y) s.values.Y={}; if(!s.values.Y[year]) s.values.Y[year]={}; s.values.Y[year]=obj;
+  } else {
+    const period=document.getElementById("periodSelect").value;
+    if(!s.values[MODE]) s.values[MODE]={}; if(!s.values[MODE][year]) s.values[MODE][year]={}; s.values[MODE][year][period]=obj;
+  }
+  setStore(s);
 }
 
-function saveCurrent(){
-  try{
-    const s=getStore();
-    if(!s.values) s.values={};
-    if(!s.values[MODE]) s.values[MODE]={};
-    const year = document.getElementById("yearSelect").value;
-    if(!s.values[MODE][year]) s.values[MODE][year]={};
-    const period = document.getElementById("periodSelect")?.value || "ROK";
-    if (MODE==="D"){
-      if(!s.values.D) s.values.D={};
-      if(!s.values.D[year]) s.values.D[year]={};
-      if(!s.values.D[year][period]) s.values.D[year][period]={};
-      document.querySelectorAll("input[data-task][data-day]").forEach(inp=>{ const t=decodeURIComponent(inp.getAttribute("data-task")); const d=parseInt(inp.getAttribute("data-day"),10); if(!s.values.D[year][period][t]) s.values.D[year][period][t]={}; s.values.D[year][period][t][d]=inp.value; });
-    } else {
-      if(!s.values[MODE][year][period]) s.values[MODE][year][period]={};
-      document.querySelectorAll("input[data-task]").forEach(inp=>{ const t=decodeURIComponent(inp.getAttribute("data-task")); s.values[MODE][year][period][t]=inp.value; });
-    }
-    setStore(s);
-    __dbg.log("saveCurrent ok", {MODE, year, period});
-  }catch(e){ __dbg.error("saveCurrent error", e); throw e; }
-}
-
+/*** ========== Tabulka ========== ***/
 function renderTable(current){
   try{
     const tasks=getTasks();
+    // Placeholder když nejsou úkoly
+    if (!Array.isArray(tasks) || tasks.length===0){
+      let thead="<thead><tr><th>Úkoly</th></tr></thead>";
+      let body="<tbody><tr><td>Žádné úkoly nejsou definované. <button id='openTasksEditor' type='button'>Otevřít editor úkolů</button></td></tr></tbody>";
+      tbl.innerHTML=thead+body;
+      document.getElementById("openTasksEditor").addEventListener("click", ()=>{
+        document.getElementById("btnAdmin").click();
+        setTimeout(()=> openAdminTab("tasks"), 0);
+      });
+      statusEl.textContent="Přidej úkoly v Admin → Úkoly.";
+      __dbg.log("renderTable: no tasks placeholder");
+      return;
+    }
+
     const year=document.getElementById("yearSelect").value;
     if (MODE==="D"){
-      const period=document.getElementById("periodSelect").value;
-      const days=monthLength(period,year);
+      const month=document.getElementById("periodSelect").value;
+      const days=monthLength(month,year);
       let thead="<thead><tr><th>#</th><th>Úkol</th>";
       for(let d=1; d<=days; d++) thead+="<th>"+d+"</th>";
       thead+="</tr></thead>";
       let body="<tbody>";
-      tasks.forEach((t,i)=>{ body+="<tr><td>"+(i+1)+"</td><td>"+t+"</td>"; for(let d=1; d<=days; d++){ const v=current[t]&&current[t][d]?current[t][d]:""; body+="<td><input data-task='"+encodeURIComponent(t)+"' data-day='"+d+"' value='"+String(v||"").replace(/'/g,"&#39;")+"' style='width:90px'></td>"; } body+="</tr>"; });
+      tasks.forEach((t,i)=>{
+        body+="<tr><td>"+(i+1)+"</td><td>"+t.replace(/</g,"&lt;")+"</td>";
+        for(let d=1; d<=days; d++){
+          const v = (current[t] && current[t][d]) ? current[t][d] : "";
+          body+="<td><input data-task='"+t.replace(/'/g,"&#39;")+"' data-day='"+d+"' type='text' value='"+String(v).replace(/'/g,"&#39;")+"' style='width:90px'></td>";
+        }
+        body+="</tr>";
+      });
       body+="</tbody>";
       tbl.innerHTML=thead+body;
     } else {
       let thead="<thead><tr><th>#</th><th>Úkol</th><th>Hodnota</th></tr></thead>";
       let body="<tbody>";
-      tasks.forEach((t,i)=>{ const v=current[t]?current[t]:""; body+="<tr><td>"+(i+1)+"</td><td>"+t+"</td><td><input data-task='"+encodeURIComponent(t)+"' value='"+String(v||"").replace(/'/g,"&#39;")+"' style='width:100%'></td></tr>"; });
+      tasks.forEach((t,i)=>{
+        const v=current[t]?current[t]:"";
+        body+="<tr><td>"+(i+1)+"</td><td>"+t.replace(/</g,"&lt;")+"</td><td><input data-task='"+t.replace(/'/g,"&#39;")+"' type='text' value='"+String(v).replace(/'/g,"&#39;")+"' style='width:100%'></td></tr>";
+      });
       body+="</tbody>";
       tbl.innerHTML=thead+body;
     }
+
     tbl.removeEventListener("input", onTableInput);
     tbl.addEventListener("input", onTableInput);
     statusEl.textContent="Načteno.";
-    __dbg.log("renderTable ok, tasks:", tasks.length);
   }catch(e){ __dbg.error("renderTable error", e); }
 }
+function onTableInput(e){
+  const t=e.target;
+  if (t && t.tagName==="INPUT"){
+    autoSave();
+  }
+}
 
-// ====== Admin modal + debug/persistence ======
-const adminModal = document.getElementById("adminModal");
-const adminClose = document.getElementById("adminClose");
-const adminGate  = document.getElementById("adminGate");
-const adminBody  = document.getElementById("adminBody");
-const btnAdmin   = document.getElementById("btnAdmin");
+let saveTimer=null;
+function autoSave(){
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+    const current=loadCurrent();
+    if (MODE==="D"){
+      // sesbírat do objektu {task:{day:value}}
+      const rows = tbl.querySelectorAll("tbody tr");
+      const obj = {};
+      rows.forEach(tr=>{
+        const task = tr.children[1]?.textContent || "";
+        obj[task] = obj[task] || {};
+        for(let i=2;i<tr.children.length;i++){
+          const inp = tr.children[i].querySelector("input");
+          const day = parseInt(inp.getAttribute("data-day"),10);
+          obj[task][day] = inp.value;
+        }
+      });
+      saveCurrent(obj);
+    } else {
+      const inputs = tbl.querySelectorAll("input[data-task]");
+      const obj = {};
+      inputs.forEach(inp=>{ obj[inp.getAttribute("data-task")] = inp.value; });
+      saveCurrent(obj);
+    }
+    statusEl.textContent = "Uloženo.";
+    doBackupMaybe();
+  }, 350);
+}
 
-btnAdmin.addEventListener("click", async (e)=>{ e.preventDefault(); adminModal.style.display="flex"; document.getElementById("pinInput").value=""; document.getElementById("pinInfo").textContent = (await hasPin()) ? "Tip: Výchozí kód 534709 funguje i jako master override." : "První vstup: výchozí PIN je 534709"; adminGate.classList.remove("hidden"); adminBody.classList.add("hidden"); document.getElementById("pinInput").focus(); __dbg.log("Admin open"); });
+/*** ========== Admin ========== ***/
+const adminModal=document.getElementById("adminModal");
+const adminGate = document.getElementById("adminGate");
+const adminBody = document.getElementById("adminBody");
+const adminClose=document.getElementById("adminClose");
+const btnAdmin = document.getElementById("btnAdmin");
+
+btnAdmin.addEventListener("click", async (e)=>{
+  e.preventDefault();
+  adminModal.style.display="flex";
+  document.getElementById("pinInput").value="";
+  const infoEl = document.getElementById("pinInfo");
+  infoEl.textContent = "";
+  const setup = document.getElementById("setupPin");
+  const pinRow = document.getElementById("pinRow");
+  const has = await hasPin();
+  adminGate.classList.remove("hidden");
+  adminBody.classList.add("hidden");
+  if (!has){
+    setup.classList.remove("hidden");
+    pinRow.classList.add("hidden");
+    infoEl.textContent = "První spuštění: nastav PIN a poté vstoupíš do administrace.";
+    document.getElementById("pinSetup1").focus();
+  } else {
+    setup.classList.add("hidden");
+    pinRow.classList.remove("hidden");
+    document.getElementById("pinInput").focus();
+  }
+  __dbg.log("Admin open");
+});
 adminClose.addEventListener("click", (e)=>{ e.preventDefault(); adminModal.style.display="none"; __dbg.log("Admin close"); });
-document.getElementById("pinEnter").addEventListener("click", async (e)=>{ e.preventDefault(); const ok = await verifyPin(document.getElementById("pinInput").value); if (!ok){ document.getElementById("pinInfo").textContent = "Chybný PIN."; __dbg.error("PIN wrong"); return; } adminGate.classList.add("hidden"); adminBody.classList.remove("hidden"); openAdminTab("data"); __dbg.log("Admin gate success"); });
 
-const adminTabs = document.querySelectorAll(".tabs-admin button");
-adminTabs.forEach(b=> b.addEventListener("click", (e)=>{ e.preventDefault(); openAdminTab(b.getAttribute("data-tab")); __dbg.log("Admin tab", b.getAttribute("data-tab")); }));
+document.getElementById("pinEnter").addEventListener("click", async ()=>{
+  const ok = await verifyPin(String(document.getElementById("pinInput").value||""));
+  if (!ok){ document.getElementById("pinInfo").textContent="Špatný PIN."; __dbg.error("PIN wrong"); return; }
+  adminGate.classList.add("hidden"); adminBody.classList.remove("hidden"); openAdminTab("data"); __dbg.log("Admin gate success");
+});
+document.getElementById("pinSetupBtn").addEventListener("click", async ()=>{
+  try{
+    const p1=String(document.getElementById("pinSetup1").value||"");
+    const p2=String(document.getElementById("pinSetup2").value||"");
+    await changePin(p1,p2);
+    document.getElementById("pinInfo").textContent="PIN nastaven. Vstupuji do administrace…";
+    adminGate.classList.add("hidden"); adminBody.classList.remove("hidden"); openAdminTab("data"); __dbg.log("First-time PIN set");
+  }catch(err){ alert(err && err.message ? err.message : "Chyba při nastavování PINu."); }
+});
 
+// Admin tabs
+const adminTabs=document.querySelectorAll(".tabs-admin button");
+adminTabs.forEach(b=> b.addEventListener("click", (e)=>{
+  e.preventDefault(); openAdminTab(b.getAttribute("data-tab"));
+}));
 function openAdminTab(id){
   adminTabs.forEach(b=> b.classList.toggle("active", b.getAttribute("data-tab")===id));
   document.getElementById("tab-data").classList.toggle("hidden", id!=="data");
   document.getElementById("tab-tasks").classList.toggle("hidden", id!=="tasks");
   document.getElementById("tab-sec").classList.toggle("hidden", id!=="sec");
-  if (id==="tasks"){ hydrateTasksEditor(); }
-  document.getElementById("backupAuto").checked = !!(getStore().backup && getStore().backup.auto === true);
-  document.getElementById("debugEnable").checked = !!(getStore().debug && getStore().debug.enabled === true);
-  updateBackupInfo();
+  if (id==="tasks"){
+    document.getElementById("modeBadge").textContent = MODE;
+    document.getElementById("tasksText").value = getTasks().join("\n");
+  }
 }
+
+// PIN change
+document.getElementById("pinChange").addEventListener("click", async ()=>{
+  try{
+    const p1=String(document.getElementById("pinNew1").value||"");
+    const p2=String(document.getElementById("pinNew2").value||"");
+    await changePin(p1,p2);
+    alert("PIN změněn.");
+    document.getElementById("pinNew1").value="";
+    document.getElementById("pinNew2").value="";
+  }catch(err){ alert(err && err.message ? err.message : "Chyba při změně PINu."); }
+});
+
+// Data (export/import/reset)
+document.getElementById("btnExport").addEventListener("click", ()=>{
+  const s=getStore();
+  const blob=new Blob([JSON.stringify(s,null,2)], {type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="KPU_backup.json"; a.click();
+  URL.revokeObjectURL(a.href);
+});
+document.getElementById("btnImport").addEventListener("click", async ()=>{
+  const f=document.getElementById("fileImport").files[0];
+  if(!f){ alert("Vyber soubor k importu."); return; }
+  try{
+    const text=await f.text();
+    const obj=JSON.parse(text);
+    setStore(obj);
+    renderSelector(); renderTable(loadCurrent());
+    alert("Import hotov.");
+  }catch(e){ alert("Chybný JSON."); }
+});
+document.getElementById("btnReset").addEventListener("click", ()=>{
+  if (!confirm("Opravdu smazat všechna uložená data? PIN zůstane zachován.")) return;
+  localStorage.removeItem(LS_KEY);
+  renderSelector(); renderTable(loadCurrent());
+  alert("Data vymazána.");
+});
+
+// Backup (FSA + auto)
+let fileHandle=null;
+document.getElementById("btnPickFile").addEventListener("click", async ()=>{
+  try{
+    if (!window.showSaveFilePicker) { alert("Pro přímé ukládání do souboru je potřeba Chromium prohlížeč na desktopu (HTTPS/localhost)."); return; }
+    fileHandle = await window.showSaveFilePicker({ suggestedName: "KPU_backup.json", types: [{description:"JSON", accept:{"application/json":[".json"]}}] });
+    document.getElementById("backupInfo").textContent = "Soubor vybrán pro tuto relaci.";
+  }catch(e){ __dbg.error("pickFile", e); }
+});
+document.getElementById("backupAuto").addEventListener("change", (e)=>{
+  const s=getStore(); if(!s.backup) s.backup={}; s.backup.auto=!!e.target.checked; setStore(s);
+  document.getElementById("backupInfo").textContent = s.backup.auto ? "Auto záloha po uložení." : "";
+});
+async function doBackupMaybe(){
+  const s=getStore(); if(!(s.backup && s.backup.auto)) return;
+  const data=JSON.stringify(getStore(), null, 2);
+  try{
+    if (fileHandle){
+      const w=await fileHandle.createWritable(); await w.write(data); await w.close();
+      __dbg.log("FSA backup OK");
+    } else {
+      // fallback: stáhne se soubor (jeden kus po každém uložení – jednoduché a funkční i na iOS)
+      const blob=new Blob([data], {type:"application/json"});
+      const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="KPU_backup.json"; a.click();
+      URL.revokeObjectURL(a.href);
+      __dbg.log("Download backup OK");
+    }
+  }catch(e){ __dbg.error("backup error", e); }
+}
+
+// Debug toggle
+document.getElementById("debugEnable").addEventListener("change", (e)=>{
+  const s=getStore(); if(!s.debug) s.debug={}; s.debug.enabled=!!e.target.checked; setStore(s); __dbg.set(s.debug.enabled);
+});
 
 // Tasks editor
-function hydrateTasksEditor(){
-  document.getElementById("tasksModeLabel").textContent = MODE;
-  const s=getStore();
-  const arr = (s.tasksCustom && s.tasksCustom[MODE] && s.tasksCustom[MODE].length) ? s.tasksCustom[MODE] : (TASKS_DEFAULT[MODE]||[]);
-  document.getElementById("tasksArea").value = arr.join("\n");
-  document.getElementById("tasksMsg").textContent = "";
-  __dbg.log("hydrateTasksEditor", MODE, arr.length);
-}
-
-function syncTasksEditorIfOpen(){
-  const isOpen = !document.getElementById("adminBody").classList.contains("hidden");
-  const tasksTabActive = Array.from(document.querySelectorAll(".tabs-admin button")).some(b=> b.classList.contains("active") && b.getAttribute("data-tab")==="tasks");
-  if (isOpen && tasksTabActive) hydrateTasksEditor();
-}
-
-document.getElementById("btnTasksSave").addEventListener("click", async (e)=>{
-  e.preventDefault();
-  try{
-    const raw = document.getElementById("tasksArea").value || "";
-    const arr = raw.split(/\r?\n/).map(x=>x.trim()).filter(x=>x.length);
-    const s=getStore(); if(!s.tasksCustom) s.tasksCustom={}; s.tasksCustom[MODE]=arr; setStore(s);
-    renderTable(loadCurrent());
-    document.getElementById("tasksMsg").innerHTML = "<span class='ok'>Uloženo.</span>";
-    __dbg.log("Tasks saved", MODE, arr.length);
-    if (isBackupEnabled()) await writeBackup();
-  }catch(err){
-    document.getElementById("tasksMsg").innerHTML = "<span class='err'>Chyba při ukládání.</span>";
-    __dbg.error("btnTasksSave error", err);
-  }
+document.getElementById("tasksSave").addEventListener("click", ()=>{
+  const lines = document.getElementById("tasksText").value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  setTasks(lines); renderTable(loadCurrent());
+  document.getElementById("tasksMsg").textContent="Uloženo.";
+});
+document.getElementById("tasksClear").addEventListener("click", ()=>{
+  setTasks([]); renderTable(loadCurrent()); document.getElementById("tasksMsg").textContent="Vyčištěno.";
 });
 
-document.getElementById("btnTasksReset").addEventListener("click", async (e)=>{
-  e.preventDefault();
+/*** ========== Init ========== ***/
+function init(){
   try{
-    const s=getStore(); if(s.tasksCustom){ delete s.tasksCustom[MODE]; setStore(s); }
-    hydrateTasksEditor();
-    renderTable(loadCurrent());
-    document.getElementById("tasksMsg").innerHTML = "<span class='ok'>Vrácen výchozí seznam.</span>";
-    __dbg.log("Tasks reset", MODE);
-    if (isBackupEnabled()) await writeBackup();
-  }catch(err){
-    document.getElementById("tasksMsg").innerHTML = "<span class='err'>Chyba při resetu.</span>";
-    __dbg.error("btnTasksReset error", err);
-  }
-});
-
-// Export/Import/Reset
-document.getElementById("btnExport").addEventListener("click", (e)=>{ e.preventDefault(); const blob=new Blob([JSON.stringify(getStore(),null,2)],{type:"application/json"}); const u=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=u; a.download="KPU_backup.json"; a.click(); URL.revokeObjectURL(u); __dbg.log("Export clicked"); });
-document.getElementById("btnImport").addEventListener("click", (e)=>{ e.preventDefault(); const f=document.getElementById("importFile").files[0]; if(!f) { alert("Vyber JSON soubor."); return; } const r=new FileReader(); r.onload=()=>{ try{ const obj=JSON.parse(r.result); setStore(obj); renderTable(loadCurrent()); alert("Import hotov."); __dbg.log("Import ok"); }catch(e){ alert("Neplatný JSON."); __dbg.error("Import parse error", e); } }; r.readAsText(f); });
-document.getElementById("btnReset").addEventListener("click", (e)=>{ e.preventDefault(); if (!confirm("Opravdu vymazat všechna uložená data?")) return; localStorage.removeItem(LS_KEY); renderTable(loadCurrent()); alert("Data smazána."); __dbg.log("Reset storage"); });
-
-// Backup (one-file)
-let backupHandle = null;
-function isFSASupported(){ return !!(window.showSaveFilePicker) && window.isSecureContext; }
-function isBackupEnabled(){ const s=getStore(); return !!(s.backup && s.backup.auto === true); }
-function updateBackupInfo(){
-  const info = document.getElementById("backupInfo");
-  const s=getStore();
-  if (isFSASupported()){
-    info.textContent = s.backup && s.backup.targetName ? ("Cílový soubor: " + s.backup.targetName) : "Cílový soubor nenastaven.";
-  } else {
-    info.textContent = "Není podpora tichého přepisu. Nabídneme stažení 'KPU_backup.json' k ručnímu nahrazení.";
-  }
-}
-async function pickBackupTarget(){
-  if (!isFSASupported()){
-    alert("Tichá záloha není v tomhle prohlížeči dostupná. Při záloze nabídneme stažení 'KPU_backup.json'.");
-    __dbg.log("pickBackupTarget fallback");
-    return;
-  }
-  try{
-    const handle = await window.showSaveFilePicker({ suggestedName: "KPU_backup.json", types: [{ description: "JSON", accept: { "application/json": [".json"] } }] });
-    window.__backupHandle = handle;
-    const s=getStore(); if(!s.backup) s.backup={};
-    s.backup.targetName = handle.name;
-    setStore(s);
-    updateBackupInfo();
-    __dbg.log("Backup target set", handle.name);
-  }catch(e){ __dbg.error("pickBackupTarget error", e); }
-}
-async function writeBackup(){
-  const data = JSON.stringify(getStore(), null, 2);
-  try{
-    if (window.__backupHandle && isFSASupported()){
-      const writable = await window.__backupHandle.createWritable();
-      await writable.write(new Blob([data], {type:"application/json"}));
-      await writable.close();
-      __dbg.log("Backup write ok (FSA)");
-      return;
-    }
-  }catch(e){ __dbg.error("writeBackup FSA error", e); }
-  try{
-    const blob = new Blob([data], {type:"application/json"});
-    const u = URL.createObjectURL(blob); const a=document.createElement("a"); a.href=u; a.download="KPU_backup.json"; a.click(); URL.revokeObjectURL(u);
-    __dbg.log("Backup download fallback ok");
-  }catch(e){ __dbg.error("writeBackup download error", e); }
-}
-
-document.getElementById("btnBackupTarget").addEventListener("click", (e)=>{ e.preventDefault(); pickBackupTarget(); });
-document.getElementById("btnBackupNow").addEventListener("click", (e)=>{ e.preventDefault(); writeBackup(); });
-document.getElementById("backupAuto").addEventListener("change", (e)=>{ const s=getStore(); if(!s.backup) s.backup={}; s.backup.auto = !!e.target.checked; setStore(s); __dbg.log("backupAuto", s.backup.auto); });
-
-// Debug toggles
-document.getElementById("debugEnable").addEventListener("change", (e)=>{
-  const s=getStore(); if(!s.debug) s.debug={};
-  s.debug.enabled = !!e.target.checked; setStore(s);
-  __dbg.set(s.debug.enabled);
-});
-document.getElementById("debugClear").addEventListener("click", ()=>{ document.getElementById("debugLog").textContent=""; __dbg.log("Log cleared"); });
-document.getElementById("debugDownload").addEventListener("click", ()=>{
-  const text = document.getElementById("debugLog").textContent || "";
-  const blob=new Blob([text],{type:"text/plain"});
-  const u=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=u; a.download="KPU_debug_log.txt"; a.click(); URL.revokeObjectURL(u);
-});
-
-// Init
-(function init(){
-  const ui=getUI();
-  const lastMode = ui.mode || "W";
-  setMode(lastMode);
-  updateBackupInfo();
-  try{
+    // Režimy
+    document.querySelectorAll(".tab").forEach(b=>{
+      b.addEventListener("click", ()=> setMode(b.getAttribute("data-mode")));
+    });
+    // UI init
+    const ui=getUI(); if(ui.mode) MODE=ui.mode;
+    setMode(MODE); // to render selectors and table
+    // Debug ON by default
     const s=getStore(); if(!s.debug) s.debug={};
-    s.debug.enabled = true; setStore(s);
-    __dbg.set(true);
-    try{ document.getElementById("debugEnable").checked = true; }catch(_){}
-    __dbg.log("Debug forced ON at init");
-  }catch(e){}
-  __dbg.log("App init OK");
-})();
+    if (typeof s.debug.enabled === "undefined") s.debug.enabled = true; // default ON
+    setStore(s);
+    __dbg.set(!!s.debug.enabled);
+    try{ document.getElementById("debugEnable").checked = !!s.debug.enabled; }catch(_){}
+    __dbg.log("Init OK; mode="+MODE);
+  }catch(e){
+    console.error("Init error", e);
+  }
+}
+
+document.getElementById("debugHide").addEventListener("click", ()=>{ __dbg.set(false); const s=getStore(); if(!s.debug) s.debug={}; s.debug.enabled=false; setStore(s); document.getElementById("debugEnable").checked=false; });
+document.getElementById("debugClear").addEventListener("click", ()=> __dbg.clear());
+
+// GO
+init();
 </script>
 </body>
 </html>
