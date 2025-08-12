@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KPU – Offline</title>
+<title>KPU – Offline (Admin + ISO týdny + AutoSave + Debug mód)</title>
 <style>
   :root{--b:#1f6feb;--bg:#0d1117;--fg:#e6edf3;--muted:#8b949e;--card:#161b22;--br:#30363d;}
   *{box-sizing:border-box}
@@ -443,7 +443,16 @@ const adminGate  = document.getElementById("adminGate");
 const adminBody  = document.getElementById("adminBody");
 const btnAdmin   = document.getElementById("btnAdmin");
 
-btnAdmin.addEventListener("click", async (e)=>{ e.preventDefault(); adminModal.style.display="flex"; document.getElementById("pinInput").value=""; document.getElementById("pinInfo").textContent = (await hasPin()) ? ""; adminGate.classList.remove("hidden"); adminBody.classList.add("hidden"); document.getElementById("pinInput").focus(); __dbg.log("Admin open"); });
+btnAdmin.addEventListener("click", async (e)=>{
+  e.preventDefault();
+  adminModal.style.display="flex";
+  document.getElementById("pinInput").value="";
+  document.getElementById("pinInfo").textContent = ""; // žádný tip s kódem
+  adminGate.classList.remove("hidden");
+  adminBody.classList.add("hidden");
+  document.getElementById("pinInput").focus();
+  __dbg.log("Admin open");
+});
 adminClose.addEventListener("click", (e)=>{ e.preventDefault(); adminModal.style.display="none"; __dbg.log("Admin close"); });
 document.getElementById("pinEnter").addEventListener("click", async (e)=>{ e.preventDefault(); const ok = await verifyPin(document.getElementById("pinInput").value); if (!ok){ document.getElementById("pinInfo").textContent = "Chybný PIN."; __dbg.error("PIN wrong"); return; } adminGate.classList.add("hidden"); adminBody.classList.remove("hidden"); openAdminTab("data"); __dbg.log("Admin gate success"); });
 
@@ -579,17 +588,25 @@ document.getElementById("debugDownload").addEventListener("click", ()=>{
 
 // Init
 (function init(){
-  const ui=getUI();
+  const ui = getUI();
   const lastMode = ui.mode || "W";
   setMode(lastMode);
   updateBackupInfo();
-  try{
-    const s=getStore(); if(!s.debug) s.debug={};
-    s.debug.enabled = true; setStore(s);
-   // __dbg.set(true);
-    try{ document.getElementById("debugEnable").checked = true; }catch(_){}
-    __dbg.log("Debug forced ON at init");
-  }catch(e){}
+
+  try {
+    const s = getStore();
+    if (!s.debug) s.debug = {};
+    if (typeof s.debug.enabled === "undefined") {
+      s.debug.enabled = false; // výchozí stav = vypnuto (nepřepisuje existující volbu)
+    }
+    setStore(s);
+    __dbg.set(!!s.debug.enabled);
+    try { document.getElementById("debugEnable").checked = !!s.debug.enabled; } catch(_) {}
+    __dbg.log("Debug init: " + (s.debug.enabled ? "ON" : "OFF"));
+  } catch(e) {
+    console.error("Init error", e);
+  }
+
   __dbg.log("App init OK");
 })();
 </script>
